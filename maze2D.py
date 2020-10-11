@@ -2,6 +2,7 @@ import tkinter as tk
 from copy import deepcopy
 import random
 from tkinter import messagebox
+from itertools import product
 
 WIDTH = 800
 HEIGHT = 600
@@ -217,11 +218,12 @@ def percolate_maze(width, height):
     wall = []
     for i in range(height):
         wall.append(deepcopy(row))
+    # initialise dict giving the panels with each given root
+    root_dict = {(i, j): [(i, j)] for i in range(height) for j in range(width)}
     # now for the iterative loop
     while panel_list:
         panel = random.choice(panel_list)
-        index = panel_list.index(panel)
-        panel_list[index:index + 1] = []
+        panel_list.remove(panel)
         if panel[2] == 0:
             adjacent_cells = [panel[0:2], [panel[0] + 1, panel[1]]]
         else:
@@ -230,11 +232,20 @@ def percolate_maze(width, height):
         root0 = root_f[adjacent_cells[0][0]][adjacent_cells[0][1]]
         root1 = root_f[adjacent_cells[1][0]][adjacent_cells[1][1]]
         if root0 != root1:
+            # knock down wall
             wall[panel[0]][panel[1]][panel[2]] = 0
-            for i in range(height):
-                for j in range(width):
-                    if root_f[i][j] == root0:
-                        root_f[i][j] = root1
+            # transfer cells with one root to the other root, depending
+            # on which of them has fewer cells
+            if len(root_dict[root0]) > len(root_dict[root1]):
+                for (i, j) in root_dict[root1]:
+                    root_f[i][j] = root0
+                root_dict[root0].extend(root_dict[root1])
+                del root_dict[root1]
+            else:
+                for (i, j) in root_dict[root0]:
+                    root_f[i][j] = root1
+                root_dict[root1].extend(root_dict[root0])
+                del root_dict[root0]
     return wall, (width-1, height-1), (0, 0)
 
 

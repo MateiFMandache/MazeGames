@@ -14,6 +14,7 @@ BLUE = (0, 0, 255)
 MILLISECONDS_PER_FRAME = 33
 ANGLE_STEP = 0.03
 TRANSLATION_STEP = 0.03
+MAX_SIZE = 10
 
 
 def random_colour():
@@ -301,7 +302,7 @@ def adjacent_panel(position_tuple, index):
     return panel
 
 
-def create_maze(width, height, depth, clear_steps, goal_postition):
+def create_maze(width, height, depth, clear_steps, goal_position):
     """
     Creates a maze with the given dimensions and the given clear steps.
     """
@@ -328,7 +329,7 @@ def create_maze(width, height, depth, clear_steps, goal_postition):
                 if tup[index] == depth - 1:
                     new_tup = tuple(np.array(tup) + np.array((0, 0, 1)))
                     panel_list.append(adjacent_panel(new_tup, index))
-    maze = Maze(panel_list, goal_postition)
+    maze = Maze(panel_list, goal_position)
     maze.translate(np.array((0, 0, 2)))
     return maze
 
@@ -572,9 +573,9 @@ def random_maze_settings():
         depth_str = depth_entry.get()
         root_settings.destroy()
         opposite_corner = True if goal_type.get() == "Goal in opposite corner" else False
-        width = int(width_str) if (width_str.isnumeric() and width_str) else 3
-        height = int(height_str) if (height_str.isnumeric() and height_str) else 3
-        depth = int(depth_str) if (depth_str.isnumeric() and depth_str) else 3
+        width = min(int(width_str), MAX_SIZE) if (width_str.isnumeric() and width_str) else 3
+        height = min(int(height_str), MAX_SIZE) if (height_str.isnumeric() and height_str) else 3
+        depth = min(int(depth_str), MAX_SIZE) if (depth_str.isnumeric() and depth_str) else 3
         maze = procedurally_generated_maze(width, height, depth, opposite_corner)
         play_maze(maze)
 
