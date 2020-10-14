@@ -2,7 +2,6 @@ import tkinter as tk
 from copy import deepcopy
 import random
 from tkinter import messagebox
-from itertools import product
 
 WIDTH = 800
 HEIGHT = 600
@@ -210,6 +209,8 @@ def percolate_maze(width, height):
                 panel_list.append([i, j, 0])
             if j < width - 1:
                 panel_list.append([i, j, 1])
+    # Randomise panel list
+    random.shuffle(panel_list)
     # initialise wall
     cell = [1, 1]
     row = []
@@ -222,8 +223,7 @@ def percolate_maze(width, height):
     root_dict = {(i, j): [(i, j)] for i in range(height) for j in range(width)}
     # now for the iterative loop
     while panel_list:
-        panel = random.choice(panel_list)
-        panel_list.remove(panel)
+        panel = panel_list.pop()
         if panel[2] == 0:
             adjacent_cells = [panel[0:2], [panel[0] + 1, panel[1]]]
         else:
